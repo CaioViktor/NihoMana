@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treino de Palavras em Katakana</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+
+      font-family:"Segoe UI",sans-serif;
+
+      background:
+        linear-gradient(135deg,#0f172a,#1e293b);
+
+      color:white;
+    }
+
+    .app{
+
+      width:100%;
+      max-width:760px;
+
+      background:rgba(255,255,255,0.06);
+
+      border:1px solid rgba(255,255,255,0.08);
+
+      backdrop-filter:blur(12px);
+
+      border-radius:28px;
+
+      padding:32px;
+
+      box-shadow:
+        0 25px 50px rgba(0,0,0,0.35);
+    }
+
+    .top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:16px;
+      margin-bottom:28px;
+    }
+
+    .title{
+      font-size:1.9rem;
+      font-weight:700;
+    }
+
+    .stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .badge{
+
+      background:rgba(255,255,255,0.08);
+
+      padding:10px 14px;
+
+      border-radius:14px;
+
+      font-size:0.95rem;
+    }
+
+    .question-box{
+
+      text-align:center;
+
+      margin-bottom:28px;
+    }
+
+    .question-type{
+
+      color:#94a3b8;
+
+      text-transform:uppercase;
+
+      letter-spacing:1px;
+
+      font-size:0.9rem;
+
+      margin-bottom:10px;
+    }
+
+    .question{
+
+      font-size:4rem;
+
+      font-weight:700;
+
+      line-height:1.2;
+
+      word-break:break-word;
+    }
+
+    .translation{
+
+      margin-top:14px;
+
+      color:#cbd5e1;
+
+      font-size:1.05rem;
+    }
+
+    .options{
+
+      display:grid;
+
+      gap:14px;
+    }
+
+    .option{
+
+      background:rgba(255,255,255,0.08);
+
+      border:none;
+
+      border-radius:18px;
+
+      padding:18px;
+
+      color:white;
+
+      font-size:1.1rem;
+
+      cursor:pointer;
+
+      transition:0.2s;
+
+      border:2px solid transparent;
+    }
+
+    .option:hover:not(:disabled){
+
+      transform:translateY(-2px);
+
+      background:rgba(255,255,255,0.12);
+
+      border-color:#60a5fa;
+    }
+
+    .option:disabled{
+      cursor:not-allowed;
+    }
+
+    .correct{
+
+      background:
+        rgba(34,197,94,0.25)!important;
+
+      border-color:#22c55e!important;
+    }
+
+    .wrong{
+
+      background:
+        rgba(239,68,68,0.25)!important;
+
+      border-color:#ef4444!important;
+    }
+
+    .feedback{
+
+      margin-top:24px;
+
+      min-height:40px;
+
+      text-align:center;
+
+      font-size:1.05rem;
+
+      font-weight:600;
+    }
+
+    .next-btn{
+
+      width:100%;
+
+      margin-top:20px;
+
+      padding:16px;
+
+      border:none;
+
+      border-radius:18px;
+
+      background:
+        linear-gradient(135deg,#3b82f6,#2563eb);
+
+      color:white;
+
+      font-size:1rem;
+
+      font-weight:700;
+
+      cursor:pointer;
+
+      transition:0.2s;
+
+      display:none;
+    }
+
+    .next-btn:hover{
+
+      transform:translateY(-2px);
+
+      filter:brightness(1.05);
+    }
+
+    @media(max-width:600px){
+
+      .app{
+        padding:22px;
+      }
+
+      .question{
+        font-size:2.8rem;
+      }
+
+      .title{
+        font-size:1.5rem;
+      }
+
+      .option{
+        font-size:1rem;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+
+    <div class="title">
+      Treino de Katakana
+    </div>
+
+    <div class="stats">
+
+      <div class="badge">
+        ✅ Acertos:
+        <span id="correctCount">0</span>
+      </div>
+
+      <div class="badge">
+        ❌ Erros:
+        <span id="wrongCount">0</span>
+      </div>
+
+      <div class="badge">
+        🎯 Questão:
+        <span id="questionCount">1</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="question-box">
+
+    <div
+      class="question-type"
+      id="questionType">
+    </div>
+
+    <div
+      class="question"
+      id="question">
+    </div>
+
+    <div
+      class="translation"
+      id="translation">
+    </div>
+
+  </div>
+
+  <div
+    class="options"
+    id="options">
+  </div>
+
+  <div
+    class="feedback"
+    id="feedback">
+  </div>
+
+  <button
+    class="next-btn"
+    id="nextBtn">
+
+    Próxima Pergunta →
+
+  </button>
+
+</div>
+
+<script>
+
+const words = [
+
+  // =========================
+  // COMIDAS E BEBIDAS
+  // =========================
+
+  { katakana:"コーヒー", romaji:"koohii", pt:"café" },
+  { katakana:"ジュース", romaji:"juusu", pt:"suco" },
+  { katakana:"ビール", romaji:"biiru", pt:"cerveja" },
+  { katakana:"ワイン", romaji:"wain", pt:"vinho" },
+  { katakana:"パン", romaji:"pan", pt:"pão" },
+  { katakana:"ケーキ", romaji:"keeki", pt:"bolo" },
+  { katakana:"ピザ", romaji:"piza", pt:"pizza" },
+  { katakana:"ハンバーガー", romaji:"hanbaagaa", pt:"hambúrguer" },
+  { katakana:"サラダ", romaji:"sarada", pt:"salada" },
+  { katakana:"アイス", romaji:"aisu", pt:"sorvete" },
+  { katakana:"ラーメン", romaji:"raamen", pt:"lámen" },
+  { katakana:"スープ", romaji:"suupu", pt:"sopa" },
+  { katakana:"チョコレート", romaji:"chokoreeto", pt:"chocolate" },
+  { katakana:"チーズ", romaji:"chiizu", pt:"queijo" },
+  { katakana:"ミルク", romaji:"miruku", pt:"leite" },
+  { katakana:"コーラ", romaji:"koora", pt:"cola" },
+  { katakana:"ステーキ", romaji:"suteeki", pt:"bife" },
+  { katakana:"ホットドッグ", romaji:"hottodoggu", pt:"cachorro-quente" },
+  { katakana:"フライドポテト", romaji:"furaidopoteto", pt:"batata frita" },
+  { katakana:"サンドイッチ", romaji:"sandoicchi", pt:"sanduíche" },
+
+  // =========================
+  // TECNOLOGIA
+  // =========================
+
+  { katakana:"スマホ", romaji:"sumaho", pt:"smartphone" },
+  { katakana:"コンピューター", romaji:"konpyuutaa", pt:"computador" },
+  { katakana:"ノートパソコン", romaji:"nootopasokon", pt:"notebook" },
+  { katakana:"インターネット", romaji:"intaanetto", pt:"internet" },
+  { katakana:"メール", romaji:"meeru", pt:"email" },
+  { katakana:"ゲーム", romaji:"geemu", pt:"jogo" },
+  { katakana:"アプリ", romaji:"apuri", pt:"aplicativo" },
+  { katakana:"ウェブサイト", romaji:"webusaito", pt:"website" },
+  { katakana:"ソフトウェア", romaji:"sofutowea", pt:"software" },
+  { katakana:"ハードウェア", romaji:"haadowea", pt:"hardware" },
+  { katakana:"パスワード", romaji:"pasuwaado", pt:"senha" },
+  { katakana:"キーボード", romaji:"kiiboodo", pt:"teclado" },
+  { katakana:"マウス", romaji:"mausu", pt:"mouse" },
+  { katakana:"モニター", romaji:"monitaa", pt:"monitor" },
+  { katakana:"タブレット", romaji:"taburetto", pt:"tablet" },
+
+  // =========================
+  // OBJETOS
+  // =========================
+
+  { katakana:"カメラ", romaji:"kamera", pt:"câmera" },
+  { katakana:"ペン", romaji:"pen", pt:"caneta" },
+  { katakana:"ノート", romaji:"nooto", pt:"caderno" },
+  { katakana:"バッグ", romaji:"baggu", pt:"bolsa" },
+  { katakana:"シャツ", romaji:"shatsu", pt:"camisa" },
+  { katakana:"ズボン", romaji:"zubon", pt:"calça" },
+  { katakana:"ドア", romaji:"doa", pt:"porta" },
+  { katakana:"ベッド", romaji:"beddo", pt:"cama" },
+  { katakana:"ソファ", romaji:"sofa", pt:"sofá" },
+  { katakana:"テーブル", romaji:"teeburu", pt:"mesa" },
+  { katakana:"エレベーター", romaji:"erebeetaa", pt:"elevador" },
+  { katakana:"テレビ", romaji:"terebi", pt:"televisão" },
+  { katakana:"ラジオ", romaji:"rajio", pt:"rádio" },
+  { katakana:"バイク", romaji:"baiku", pt:"moto" },
+  { katakana:"ヘルメット", romaji:"herumetto", pt:"capacete" },
+
+  // =========================
+  // LUGARES
+  // =========================
+
+  { katakana:"ホテル", romaji:"hoteru", pt:"hotel" },
+  { katakana:"レストラン", romaji:"resutoran", pt:"restaurante" },
+  { katakana:"スーパー", romaji:"suupaa", pt:"supermercado" },
+  { katakana:"コンビニ", romaji:"konbini", pt:"loja de conveniência" },
+  { katakana:"デパート", romaji:"depaato", pt:"shopping" },
+  { katakana:"カフェ", romaji:"kafe", pt:"cafeteria" },
+  { katakana:"バー", romaji:"baa", pt:"bar" },
+  { katakana:"パーク", romaji:"paaku", pt:"parque" },
+  { katakana:"ビーチ", romaji:"biichi", pt:"praia" },
+  { katakana:"スタジアム", romaji:"sutajiamu", pt:"estádio" },
+  { katakana:"ミュージアム", romaji:"myuujiamu", pt:"museu" },
+  { katakana:"ライブラリー", romaji:"raiburarii", pt:"biblioteca" },
+
+  // =========================
+  // PAÍSES
+  // =========================
+
+  { katakana:"ブラジル", romaji:"burajiru", pt:"Brasil" },
+  { katakana:"アメリカ", romaji:"amerika", pt:"Estados Unidos" },
+  { katakana:"カナダ", romaji:"kanada", pt:"Canadá" },
+  { katakana:"メキシコ", romaji:"mekishiko", pt:"México" },
+  { katakana:"フランス", romaji:"furansu", pt:"França" },
+  { katakana:"ドイツ", romaji:"doitsu", pt:"Alemanha" },
+  { katakana:"イタリア", romaji:"itaria", pt:"Itália" },
+  { katakana:"スペイン", romaji:"supein", pt:"Espanha" },
+  { katakana:"ポルトガル", romaji:"porutogaru", pt:"Portugal" },
+  { katakana:"ロシア", romaji:"roshia", pt:"Rússia" },
+  { katakana:"インド", romaji:"indo", pt:"Índia" },
+  { katakana:"タイ", romaji:"tai", pt:"Tailândia" },
+  { katakana:"ベトナム", romaji:"betonamu", pt:"Vietnã" },
+  { katakana:"オーストラリア", romaji:"oosutoraria", pt:"Austrália" },
+  { katakana:"アルゼンチン", romaji:"aruzenchin", pt:"Argentina" },
+
+  // =========================
+  // CIDADES
+  // =========================
+
+  { katakana:"トウキョウ", romaji:"toukyou", pt:"Tóquio" },
+  { katakana:"オオサカ", romaji:"oosaka", pt:"Osaka" },
+  { katakana:"パリ", romaji:"pari", pt:"Paris" },
+  { katakana:"ロンドン", romaji:"rondon", pt:"Londres" },
+  { katakana:"ニューヨーク", romaji:"nyuuyooku", pt:"Nova York" },
+  { katakana:"ロサンゼルス", romaji:"rosanzerusu", pt:"Los Angeles" },
+  { katakana:"ベルリン", romaji:"berurin", pt:"Berlim" },
+  { katakana:"マドリード", romaji:"madoriido", pt:"Madri" },
+  { katakana:"リスボン", romaji:"risubon", pt:"Lisboa" },
+  { katakana:"モスクワ", romaji:"mosukuwa", pt:"Moscou" },
+
+  // =========================
+  // LÍNGUAS
+  // =========================
+
+  { katakana:"ポルトガルゴ", romaji:"porutogarugo", pt:"língua portuguesa" },
+  { katakana:"エイゴ", romaji:"eigo", pt:"língua inglesa" },
+  { katakana:"ニホンゴ", romaji:"nihongo", pt:"língua japonesa" },
+  { katakana:"フランスゴ", romaji:"furansugo", pt:"língua francesa" },
+  { katakana:"スペインゴ", romaji:"supeingo", pt:"língua espanhola" },
+  { katakana:"ドイツゴ", romaji:"doitsugo", pt:"língua alemã" },
+  { katakana:"イタリアゴ", romaji:"itariago", pt:"língua italiana" },
+  { katakana:"チュウゴクゴ", romaji:"chuugokugo", pt:"língua chinesa" },
+  { katakana:"カンコクゴ", romaji:"kankokugo", pt:"língua coreana" },
+  { katakana:"ロシアゴ", romaji:"roshiago", pt:"língua russa" },
+
+  // =========================
+  // NACIONALIDADES
+  // =========================
+
+  { katakana:"ブラジルジン", romaji:"burajirujin", pt:"brasileiro" },
+  { katakana:"アメリカジン", romaji:"amerikajin", pt:"americano" },
+  { katakana:"カナダジン", romaji:"kanadajin", pt:"canadense" },
+  { katakana:"フランスジン", romaji:"furansujin", pt:"francês" },
+  { katakana:"ドイツジン", romaji:"doitsujin", pt:"alemão" },
+  { katakana:"イタリアジン", romaji:"itariajin", pt:"italiano" },
+  { katakana:"スペインジン", romaji:"supeinjin", pt:"espanhol" },
+  { katakana:"ポルトガルジン", romaji:"porutogarujin", pt:"português" },
+  { katakana:"ニホンジン", romaji:"nihonjin", pt:"japonês" },
+  { katakana:"カンコクジン", romaji:"kankokujin", pt:"coreano" },
+
+  // =========================
+  // NOMES
+  // =========================
+
+  { katakana:"マリア", romaji:"maria", pt:"Maria" },
+  { katakana:"ジョアン", romaji:"joan", pt:"João" },
+  { katakana:"アナ", romaji:"ana", pt:"Ana" },
+  { katakana:"カルロス", romaji:"karurosu", pt:"Carlos" },
+  { katakana:"ルーカス", romaji:"ruukasu", pt:"Lucas" },
+  { katakana:"マルコ", romaji:"maruko", pt:"Marco" },
+  { katakana:"ダニエル", romaji:"danieru", pt:"Daniel" },
+  { katakana:"エリカ", romaji:"erika", pt:"Érica" },
+  { katakana:"パウロ", romaji:"pauro", pt:"Paulo" },
+  { katakana:"フェルナンド", romaji:"ferunando", pt:"Fernando" },
+  { katakana:"アレックス", romaji:"arekkusu", pt:"Alex" },
+  { katakana:"ケン", romaji:"ken", pt:"Ken" },
+  { katakana:"ジョージ", romaji:"jooji", pt:"George" },
+  { katakana:"マイケル", romaji:"maikeru", pt:"Michael" },
+  { katakana:"クリス", romaji:"kurisu", pt:"Chris" },
+
+  // =========================
+  // ESPORTES
+  // =========================
+
+  { katakana:"サッカー", romaji:"sakkaa", pt:"futebol" },
+  { katakana:"テニス", romaji:"tenisu", pt:"tênis" },
+  { katakana:"バスケットボール", romaji:"basukettobooru", pt:"basquete" },
+  { katakana:"バレーボール", romaji:"bareebooru", pt:"vôlei" },
+  { katakana:"ゴルフ", romaji:"gorufu", pt:"golfe" },
+  { katakana:"ラグビー", romaji:"ragubii", pt:"rugby" },
+  { katakana:"ボクシング", romaji:"bokushingu", pt:"boxe" },
+  { katakana:"スイミング", romaji:"suimingu", pt:"natação" },
+
+  // =========================
+  // PROFISSÕES
+  // =========================
+
+  { katakana:"プログラマー", romaji:"puroguramaa", pt:"programador" },
+  { katakana:"エンジニア", romaji:"enjinia", pt:"engenheiro" },
+  { katakana:"デザイナー", romaji:"dezainaa", pt:"designer" },
+  { katakana:"ドクター", romaji:"dokutaa", pt:"médico" },
+  { katakana:"ジャーナリスト", romaji:"jaanaristo", pt:"jornalista" },
+  { katakana:"マネージャー", romaji:"maneejaa", pt:"gerente" },
+  { katakana:"モデル", romaji:"moderu", pt:"modelo" },
+  { katakana:"アーティスト", romaji:"aatisuto", pt:"artista" },
+
+  // =========================
+  // CULTURA POP
+  // =========================
+
+  { katakana:"アニメ", romaji:"anime", pt:"anime" },
+  { katakana:"マンガ", romaji:"manga", pt:"mangá" },
+  { katakana:"コスプレ", romaji:"kosupure", pt:"cosplay" },
+  { katakana:"アイドル", romaji:"aidoru", pt:"ídolo" },
+  { katakana:"ヒーロー", romaji:"hiiroo", pt:"herói" },
+  { katakana:"ドラゴン", romaji:"doragon", pt:"dragão" },
+  { katakana:"モンスター", romaji:"monsutaa", pt:"monstro" },
+  { katakana:"ロボット", romaji:"robotto", pt:"robô" }
+
+];
+
+let currentQuestion = null;
+
+let answered = false;
+
+let correct = 0;
+
+let wrong = 0;
+
+let questionCount = 1;
+
+const questionEl =
+  document.getElementById("question");
+
+const translationEl =
+  document.getElementById("translation");
+
+const optionsEl =
+  document.getElementById("options");
+
+const feedbackEl =
+  document.getElementById("feedback");
+
+const nextBtn =
+  document.getElementById("nextBtn");
+
+const questionTypeEl =
+  document.getElementById("questionType");
+
+const correctCountEl =
+  document.getElementById("correctCount");
+
+const wrongCountEl =
+  document.getElementById("wrongCount");
+
+const questionCountEl =
+  document.getElementById("questionCount");
+
+function shuffle(array){
+
+  return [...array]
+    .sort(()=>Math.random()-0.5);
+}
+
+function randomItem(array){
+
+  return array[
+    Math.floor(
+      Math.random()*array.length
+    )
+  ];
+}
+
+function generateQuestion(){
+
+  answered = false;
+
+  optionsEl.innerHTML = "";
+
+  feedbackEl.innerHTML = "";
+
+  nextBtn.style.display = "none";
+
+  /*
+    TIPOS
+
+    1 = Katakana -> Romaji
+    2 = Romaji -> Katakana
+    3 = Português -> Katakana
+  */
+
+  const random = Math.random();
+
+  let type;
+
+  // prioridade para tipo 1
+
+  if(random < 0.55){
+
+    type = 1;
+
+  } else if(random < 0.85){
+
+    type = 2;
+
+  } else {
+
+    type = 3;
+  }
+
+  const word = randomItem(words);
+
+  let options = [];
+
+  // ====================================
+  // TIPO 1
+  // ====================================
+
+  if(type === 1){
+
+    questionTypeEl.textContent =
+      "Qual é a leitura desta palavra?";
+
+    questionEl.textContent =
+      word.katakana;
+
+    translationEl.innerHTML =
+      `🇧🇷 Tradução: <strong>${word.pt}</strong>`;
+
+    options.push(word.romaji);
+
+    while(options.length < 5){
+
+      const candidate =
+        randomItem(words).romaji;
+
+      if(!options.includes(candidate)){
+
+        options.push(candidate);
+      }
+    }
+
+    options = shuffle(options);
+
+    currentQuestion = {
+
+      type,
+
+      correct: word.romaji,
+
+      displayCorrect: word.romaji
+    };
+  }
+
+  // ====================================
+  // TIPO 2
+  // ====================================
+
+  else if(type === 2){
+
+    questionTypeEl.textContent =
+      "Qual é o Katakana correto?";
+
+    questionEl.textContent =
+      word.romaji;
+
+    translationEl.innerHTML =
+      `🇧🇷 Tradução: <strong>${word.pt}</strong>`;
+
+    options.push(word.katakana);
+
+    while(options.length < 5){
+
+      const candidate =
+        randomItem(words).katakana;
+
+      if(!options.includes(candidate)){
+
+        options.push(candidate);
+      }
+    }
+
+    options = shuffle(options);
+
+    currentQuestion = {
+
+      type,
+
+      correct: word.katakana,
+
+      displayCorrect: word.katakana
+    };
+  }
+
+  // ====================================
+  // TIPO 3
+  // ====================================
+
+  else {
+
+    questionTypeEl.textContent =
+      "Qual é o Katakana desta palavra?";
+
+    questionEl.textContent =
+      word.pt;
+
+    translationEl.innerHTML =
+      `🔤 Escrita fonética: <strong>${word.romaji}</strong>`;
+
+    options.push(word.katakana);
+
+    while(options.length < 5){
+
+      const candidate =
+        randomItem(words).katakana;
+
+      if(!options.includes(candidate)){
+
+        options.push(candidate);
+      }
+    }
+
+    options = shuffle(options);
+
+    currentQuestion = {
+
+      type,
+
+      correct: word.katakana,
+
+      displayCorrect: word.katakana
+    };
+  }
+
+  options.forEach(option=>{
+
+    const btn =
+      document.createElement("button");
+
+    btn.className = "option";
+
+    btn.textContent = option;
+
+    btn.addEventListener("click",()=>{
+
+      checkAnswer(btn,option);
+
+    });
+
+    optionsEl.appendChild(btn);
+
+  });
+
+}
+
+function checkAnswer(button,selected){
+
+  if(answered) return;
+
+  answered = true;
+
+  const buttons =
+    document.querySelectorAll(".option");
+
+  buttons.forEach(btn=>{
+
+    btn.disabled = true;
+
+  });
+
+  if(selected === currentQuestion.correct){
+
+    button.classList.add("correct");
+
+    feedbackEl.innerHTML =
+      "✅ Correto!";
+
+    correct++;
+
+    correctCountEl.textContent =
+      correct;
+
+  } else {
+
+    button.classList.add("wrong");
+
+    buttons.forEach(btn=>{
+
+      if(
+        btn.textContent ===
+        currentQuestion.correct
+      ){
+
+        btn.classList.add("correct");
+      }
+
+    });
+
+    feedbackEl.innerHTML =
+      `❌ Errado! A resposta correta é <strong>${currentQuestion.displayCorrect}</strong>.`;
+
+    wrong++;
+
+    wrongCountEl.textContent =
+      wrong;
+  }
+
+  nextBtn.style.display = "block";
+}
+
+nextBtn.addEventListener("click",()=>{
+
+  questionCount++;
+
+  questionCountEl.textContent =
+    questionCount;
+
+  generateQuestion();
+
+});
+
+generateQuestion();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Treino de Katakana</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 700px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.08);
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+    }
+
+    .question-box {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .question-type {
+      color: #94a3b8;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .question {
+      font-size: 5rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      word-break: break-word;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .option {
+      background: rgba(255,255,255,0.08);
+      border: 2px solid transparent;
+      border-radius: 16px;
+      padding: 18px;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .option:hover:not(:disabled) {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.12);
+      border-color: #60a5fa;
+    }
+
+    .option:disabled {
+      cursor: not-allowed;
+      opacity: 0.85;
+    }
+
+    .correct {
+      background: rgba(34,197,94,0.25) !important;
+      border-color: #22c55e !important;
+    }
+
+    .wrong {
+      background: rgba(239,68,68,0.25) !important;
+      border-color: #ef4444 !important;
+    }
+
+    .feedback {
+      margin-top: 24px;
+      min-height: 40px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .next-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      display: none;
+    }
+
+    .next-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    @media (max-width: 600px) {
+      .question {
+        font-size: 3.5rem;
+      }
+
+      .option {
+        font-size: 1rem;
+        padding: 16px;
+      }
+
+      .title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+    <div class="title">Treino de Katakana</div>
+
+    <div class="stats">
+      <div class="badge">✅ Acertos: <span id="correctCount">0</span></div>
+      <div class="badge">❌ Erros: <span id="wrongCount">0</span></div>
+      <div class="badge">🎯 Questão: <span id="questionNumber">1</span></div>
+    </div>
+  </div>
+
+  <div class="question-box">
+    <div class="question-type" id="questionType"></div>
+    <div class="question" id="question"></div>
+  </div>
+
+  <div class="options" id="options"></div>
+
+  <div class="feedback" id="feedback"></div>
+
+  <button class="next-btn" id="nextBtn">
+    Próxima Pergunta →
+  </button>
+
+</div>
+
+<script>
+const katakanaData = [
+  { kana: "ア", romaji: "a" },
+  { kana: "イ", romaji: "i" },
+  { kana: "ウ", romaji: "u" },
+  { kana: "エ", romaji: "e" },
+  { kana: "オ", romaji: "o" },
+
+  { kana: "カ", romaji: "ka" },
+  { kana: "キ", romaji: "ki" },
+  { kana: "ク", romaji: "ku" },
+  { kana: "ケ", romaji: "ke" },
+  { kana: "コ", romaji: "ko" },
+
+  { kana: "サ", romaji: "sa" },
+  { kana: "シ", romaji: "shi" },
+  { kana: "ス", romaji: "su" },
+  { kana: "セ", romaji: "se" },
+  { kana: "ソ", romaji: "so" },
+
+  { kana: "タ", romaji: "ta" },
+  { kana: "チ", romaji: "chi" },
+  { kana: "ツ", romaji: "tsu" },
+  { kana: "テ", romaji: "te" },
+  { kana: "ト", romaji: "to" },
+
+  { kana: "ナ", romaji: "na" },
+  { kana: "ニ", romaji: "ni" },
+  { kana: "ヌ", romaji: "nu" },
+  { kana: "ネ", romaji: "ne" },
+  { kana: "ノ", romaji: "no" },
+
+  { kana: "ハ", romaji: "ha" },
+  { kana: "ヒ", romaji: "hi" },
+  { kana: "フ", romaji: "fu" },
+  { kana: "ヘ", romaji: "he" },
+  { kana: "ホ", romaji: "ho" },
+
+  { kana: "マ", romaji: "ma" },
+  { kana: "ミ", romaji: "mi" },
+  { kana: "ム", romaji: "mu" },
+  { kana: "メ", romaji: "me" },
+  { kana: "モ", romaji: "mo" },
+
+  { kana: "ヤ", romaji: "ya" },
+  { kana: "ユ", romaji: "yu" },
+  { kana: "ヨ", romaji: "yo" },
+
+  { kana: "ラ", romaji: "ra" },
+  { kana: "リ", romaji: "ri" },
+  { kana: "ル", romaji: "ru" },
+  { kana: "レ", romaji: "re" },
+  { kana: "ロ", romaji: "ro" },
+
+  { kana: "ワ", romaji: "wa" },
+  { kana: "ヲ", romaji: "wo" },
+  { kana: "ン", romaji: "n" }
+];
+
+let currentQuestion = null;
+let answered = false;
+
+let correct = 0;
+let wrong = 0;
+let questionNumber = 1;
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const feedbackEl = document.getElementById("feedback");
+const nextBtn = document.getElementById("nextBtn");
+const questionTypeEl = document.getElementById("questionType");
+
+const correctCountEl = document.getElementById("correctCount");
+const wrongCountEl = document.getElementById("wrongCount");
+const questionNumberEl = document.getElementById("questionNumber");
+
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+function pickRandom(array, exclude = []) {
+  const filtered = array.filter(
+    item => !exclude.includes(item)
+  );
+  return filtered[Math.floor(Math.random() * filtered.length)];
+}
+
+function generateQuestion() {
+
+  answered = false;
+  feedbackEl.textContent = "";
+  nextBtn.style.display = "none";
+  optionsEl.innerHTML = "";
+
+  // prioridade tipo 1
+  const type = Math.random() < 0.75 ? 1 : 2;
+
+  const correctItem = katakanaData[
+    Math.floor(Math.random() * katakanaData.length)
+  ];
+
+  let options = [];
+
+  if (type === 1) {
+
+    questionTypeEl.textContent =
+      "Qual é a leitura deste Katakana?";
+
+    questionEl.textContent = correctItem.kana;
+
+    options.push(correctItem.romaji);
+
+    while (options.length < 5) {
+      const random = pickRandom(
+        katakanaData.map(k => k.romaji),
+        options
+      );
+
+      options.push(random);
+    }
+
+    options = shuffle(options);
+
+    currentQuestion = {
+      type,
+      correct: correctItem.romaji,
+      kana: correctItem.kana
+    };
+
+  } else {
+
+    questionTypeEl.textContent =
+      "Qual Katakana corresponde à leitura?";
+
+    questionEl.textContent = correctItem.romaji;
+
+    options.push(correctItem.kana);
+
+    while (options.length < 5) {
+      const random = pickRandom(
+        katakanaData.map(k => k.kana),
+        options
+      );
+
+      options.push(random);
+    }
+
+    options = shuffle(options);
+
+    currentQuestion = {
+      type,
+      correct: correctItem.kana,
+      romaji: correctItem.romaji
+    };
+  }
+
+  options.forEach(option => {
+
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = option;
+
+    btn.addEventListener("click", () => {
+      checkAnswer(btn, option);
+    });
+
+    optionsEl.appendChild(btn);
+  });
+}
+
+function checkAnswer(button, selected) {
+
+  if (answered) return;
+
+  answered = true;
+
+  const buttons = document.querySelectorAll(".option");
+
+  buttons.forEach(btn => btn.disabled = true);
+
+  if (selected === currentQuestion.correct) {
+
+    button.classList.add("correct");
+
+    feedbackEl.innerHTML = "✅ Correto!";
+
+    correct++;
+    correctCountEl.textContent = correct;
+
+  } else {
+
+    button.classList.add("wrong");
+
+    buttons.forEach(btn => {
+      if (btn.textContent === currentQuestion.correct) {
+        btn.classList.add("correct");
+      }
+    });
+
+    if (currentQuestion.type === 1) {
+      feedbackEl.innerHTML =
+        `❌ Errado! A leitura correta de <strong>${currentQuestion.kana}</strong> é <strong>${currentQuestion.correct}</strong>.`;
+    } else {
+      feedbackEl.innerHTML =
+        `❌ Errado! O katakana correto para <strong>${currentQuestion.romaji}</strong> é <strong>${currentQuestion.correct}</strong>.`;
+    }
+
+    wrong++;
+    wrongCountEl.textContent = wrong;
+  }
+
+  nextBtn.style.display = "block";
+}
+
+nextBtn.addEventListener("click", () => {
+  questionNumber++;
+  questionNumberEl.textContent = questionNumber;
+  generateQuestion();
+});
+
+generateQuestion();
+
+</script>
+
+</body>
+</html>

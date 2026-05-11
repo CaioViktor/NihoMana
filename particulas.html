@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treino de Partículas Japonesas</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+
+      min-height:100vh;
+
+      display:flex;
+      justify-content:center;
+      align-items:center;
+
+      padding:20px;
+
+      font-family:"Segoe UI",sans-serif;
+
+      background:
+        linear-gradient(135deg,#0f172a,#1e293b);
+
+      color:white;
+    }
+
+    .app{
+
+      width:100%;
+      max-width:900px;
+
+      background:
+        rgba(255,255,255,0.06);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      backdrop-filter:blur(12px);
+
+      border-radius:28px;
+
+      padding:32px;
+
+      box-shadow:
+        0 25px 50px rgba(0,0,0,0.35);
+    }
+
+    .top{
+
+      display:flex;
+
+      justify-content:space-between;
+
+      align-items:center;
+
+      flex-wrap:wrap;
+
+      gap:16px;
+
+      margin-bottom:28px;
+    }
+
+    .title{
+
+      font-size:1.9rem;
+
+      font-weight:700;
+    }
+
+    .stats{
+
+      display:flex;
+
+      flex-wrap:wrap;
+
+      gap:12px;
+    }
+
+    .badge{
+
+      background:
+        rgba(255,255,255,0.08);
+
+      padding:10px 14px;
+
+      border-radius:14px;
+
+      font-size:0.95rem;
+    }
+
+    .question-box{
+
+      margin-bottom:28px;
+
+      text-align:center;
+    }
+
+    .question-type{
+
+      color:#94a3b8;
+
+      text-transform:uppercase;
+
+      letter-spacing:1px;
+
+      font-size:0.9rem;
+
+      margin-bottom:14px;
+    }
+
+    .sentence{
+
+      font-size:2.2rem;
+
+      line-height:1.7;
+
+      font-weight:700;
+
+      margin-bottom:18px;
+    }
+
+    .translation{
+
+      color:#cbd5e1;
+
+      font-size:1.05rem;
+    }
+
+    .options{
+
+      display:grid;
+
+      grid-template-columns:
+        repeat(auto-fit,minmax(120px,1fr));
+
+      gap:14px;
+    }
+
+    .option{
+
+      background:
+        rgba(255,255,255,0.08);
+
+      border:none;
+
+      border-radius:18px;
+
+      padding:18px;
+
+      color:white;
+
+      font-size:1.4rem;
+
+      font-weight:700;
+
+      cursor:pointer;
+
+      transition:0.2s;
+
+      border:2px solid transparent;
+    }
+
+    .option:hover:not(:disabled){
+
+      transform:translateY(-2px);
+
+      background:
+        rgba(255,255,255,0.12);
+
+      border-color:#60a5fa;
+    }
+
+    .option:disabled{
+
+      cursor:not-allowed;
+    }
+
+    .correct{
+
+      background:
+        rgba(34,197,94,0.25)!important;
+
+      border-color:#22c55e!important;
+    }
+
+    .wrong{
+
+      background:
+        rgba(239,68,68,0.25)!important;
+
+      border-color:#ef4444!important;
+    }
+
+    .feedback{
+
+      margin-top:26px;
+
+      min-height:80px;
+
+      background:
+        rgba(255,255,255,0.05);
+
+      border-radius:18px;
+
+      padding:18px;
+
+      line-height:1.7;
+
+      font-size:1rem;
+    }
+
+    .next-btn{
+
+      width:100%;
+
+      margin-top:22px;
+
+      padding:16px;
+
+      border:none;
+
+      border-radius:18px;
+
+      background:
+        linear-gradient(135deg,#3b82f6,#2563eb);
+
+      color:white;
+
+      font-size:1rem;
+
+      font-weight:700;
+
+      cursor:pointer;
+
+      transition:0.2s;
+
+      display:none;
+    }
+
+    .next-btn:hover{
+
+      transform:translateY(-2px);
+
+      filter:brightness(1.05);
+    }
+
+    .particle-guide{
+
+      margin-top:30px;
+
+      background:
+        rgba(255,255,255,0.05);
+
+      border-radius:20px;
+
+      padding:20px;
+    }
+
+    .particle-guide h3{
+
+      margin-bottom:14px;
+    }
+
+    .particle-grid{
+
+      display:grid;
+
+      grid-template-columns:
+        repeat(auto-fit,minmax(140px,1fr));
+
+      gap:12px;
+    }
+
+    .particle-card{
+
+      background:
+        rgba(255,255,255,0.05);
+
+      padding:12px;
+
+      border-radius:14px;
+    }
+
+    .particle-card strong{
+
+      display:block;
+
+      font-size:1.3rem;
+
+      margin-bottom:6px;
+    }
+
+    @media(max-width:700px){
+
+      .sentence{
+        font-size:1.6rem;
+      }
+
+      .option{
+        font-size:1.1rem;
+      }
+
+      .title{
+        font-size:1.5rem;
+      }
+
+      .app{
+        padding:22px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+
+    <div class="title">
+      Treino de Partículas Japonesas
+    </div>
+
+    <div class="stats">
+
+      <div class="badge">
+        ✅ Acertos:
+        <span id="correctCount">0</span>
+      </div>
+
+      <div class="badge">
+        ❌ Erros:
+        <span id="wrongCount">0</span>
+      </div>
+
+      <div class="badge">
+        🎯 Questão:
+        <span id="questionCount">1</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="question-box">
+
+    <div class="question-type">
+      Escolha a partícula correta
+    </div>
+
+    <div
+      class="sentence"
+      id="sentence">
+    </div>
+
+    <div
+      class="translation"
+      id="translation">
+    </div>
+
+  </div>
+
+  <div
+    class="options"
+    id="options">
+  </div>
+
+  <div
+    class="feedback"
+    id="feedback">
+  </div>
+
+  <button
+    class="next-btn"
+    id="nextBtn">
+
+    Próxima Pergunta →
+
+  </button>
+
+  <div class="particle-guide">
+
+    <h3>Resumo das Partículas</h3>
+
+    <div class="particle-grid">
+
+      <div class="particle-card">
+        <strong>は</strong>
+        tópico
+      </div>
+
+      <div class="particle-card">
+        <strong>が</strong>
+        sujeito / foco
+      </div>
+
+      <div class="particle-card">
+        <strong>の</strong>
+        posse / “de”
+      </div>
+
+      <div class="particle-card">
+        <strong>を</strong>
+        objeto direto
+      </div>
+
+      <div class="particle-card">
+        <strong>に</strong>
+        destino / tempo
+      </div>
+
+      <div class="particle-card">
+        <strong>で</strong>
+        local da ação
+      </div>
+
+      <div class="particle-card">
+        <strong>と</strong>
+        com / e
+      </div>
+
+      <div class="particle-card">
+        <strong>も</strong>
+        também
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const particles = [
+  "は",
+  "が",
+  "の",
+  "を",
+  "に",
+  "で",
+  "と",
+  "も"
+];
+
+// SUBSTITUA o array const questions = [...] por este abaixo
+
+const questions = [
+
+  // =========================
+  // は
+  // =========================
+
+  {
+    sentence:"わたし ___ ブラジルじん です。",
+    correct:"は",
+    translation:"Eu sou brasileiro.",
+    explanation:"は marca o tópico da frase."
+  },
+
+  {
+    sentence:"マリアさん ___ がくせい です。",
+    correct:"は",
+    translation:"Maria é estudante.",
+    explanation:"は define Maria como tópico."
+  },
+
+  {
+    sentence:"きょう ___ あついです。",
+    correct:"は",
+    translation:"Hoje está quente.",
+    explanation:"は destaca o assunto principal da frase."
+  },
+
+  {
+    sentence:"にほんご ___ むずかしいです。",
+    correct:"は",
+    translation:"Japonês é difícil.",
+    explanation:"は introduz o tópico 'língua japonesa'."
+  },
+
+  {
+    sentence:"このラーメン ___ おいしいです。",
+    correct:"は",
+    translation:"Este lámen é gostoso.",
+    explanation:"は marca o tópico."
+  },
+
+  {
+    sentence:"わたしのしゅみ ___ ゲームです。",
+    correct:"は",
+    translation:"Meu hobby é jogos.",
+    explanation:"は conecta tópico e descrição."
+  },
+
+  {
+    sentence:"サッカー ___ すきです。",
+    correct:"は",
+    translation:"Eu gosto de futebol.",
+    explanation:"は introduz o assunto principal."
+  },
+
+  {
+    sentence:"あした ___ しごとです。",
+    correct:"は",
+    translation:"Amanhã é dia de trabalho.",
+    explanation:"は marca o tópico temporal."
+  },
+
+  {
+    sentence:"このホテル ___ きれいです。",
+    correct:"は",
+    translation:"Este hotel é bonito.",
+    explanation:"は marca o tópico."
+  },
+
+  {
+    sentence:"わたし ___ エンジニアです。",
+    correct:"は",
+    translation:"Eu sou engenheiro.",
+    explanation:"は indica o tópico principal."
+  },
+
+  // =========================
+  // が
+  // =========================
+
+  {
+    sentence:"ねこ ___ います。",
+    correct:"が",
+    translation:"Há um gato.",
+    explanation:"が marca o sujeito da existência."
+  },
+
+  {
+    sentence:"だれ ___ きましたか。",
+    correct:"が",
+    translation:"Quem veio?",
+    explanation:"が enfatiza o sujeito desconhecido."
+  },
+
+  {
+    sentence:"あめ ___ ふっています。",
+    correct:"が",
+    translation:"Está chovendo.",
+    explanation:"が marca o sujeito do fenômeno."
+  },
+
+  {
+    sentence:"せんせい ___ きました。",
+    correct:"が",
+    translation:"O professor chegou.",
+    explanation:"が enfatiza quem realizou a ação."
+  },
+
+  {
+    sentence:"いぬ ___ すきです。",
+    correct:"が",
+    translation:"Eu gosto de cachorros.",
+    explanation:"が é comum com 好き (gostar)."
+  },
+
+  {
+    sentence:"なに ___ ほしいですか。",
+    correct:"が",
+    translation:"O que você quer?",
+    explanation:"が marca o objeto desejado."
+  },
+
+  {
+    sentence:"ともだち ___ たくさんいます。",
+    correct:"が",
+    translation:"Tenho muitos amigos.",
+    explanation:"が marca existência."
+  },
+
+  {
+    sentence:"どのひと ___ せんせいですか。",
+    correct:"が",
+    translation:"Qual pessoa é o professor?",
+    explanation:"が destaca o sujeito da pergunta."
+  },
+
+  {
+    sentence:"だれ ___ にほんご を はなしますか。",
+    correct:"が",
+    translation:"Quem fala japonês?",
+    explanation:"が marca o sujeito interrogativo."
+  },
+
+  {
+    sentence:"くるま ___ あります。",
+    correct:"が",
+    translation:"Há um carro.",
+    explanation:"が marca existência de objeto."
+  },
+
+  // =========================
+  // の
+  // =========================
+
+  {
+    sentence:"これは わたし ___ ほんです。",
+    correct:"の",
+    translation:"Este é meu livro.",
+    explanation:"の indica posse."
+  },
+
+  {
+    sentence:"にほん ___ たべもの は おいしいです。",
+    correct:"の",
+    translation:"A comida do Japão é gostosa.",
+    explanation:"の conecta substantivos."
+  },
+
+  {
+    sentence:"マリアさん ___ かばんです。",
+    correct:"の",
+    translation:"É a bolsa da Maria.",
+    explanation:"の mostra relação de posse."
+  },
+
+  {
+    sentence:"あれは せんせい ___ くるまです。",
+    correct:"の",
+    translation:"Aquele é o carro do professor.",
+    explanation:"の indica posse."
+  },
+
+  {
+    sentence:"これは なん ___ ほんですか。",
+    correct:"の",
+    translation:"Livro de quê é este?",
+    explanation:"の conecta substantivos."
+  },
+
+  {
+    sentence:"わたし ___ ともだち は アメリカじんです。",
+    correct:"の",
+    translation:"Meu amigo é americano.",
+    explanation:"の indica posse."
+  },
+
+  {
+    sentence:"とうきょう ___ しゃしんです。",
+    correct:"の",
+    translation:"É uma foto de Tóquio.",
+    explanation:"の relaciona os substantivos."
+  },
+
+  {
+    sentence:"あに ___ へやです。",
+    correct:"の",
+    translation:"É o quarto do meu irmão mais velho.",
+    explanation:"の indica posse."
+  },
+
+  {
+    sentence:"これは にほん ___ えいがです。",
+    correct:"の",
+    translation:"Este é um filme japonês.",
+    explanation:"の relaciona origem."
+  },
+
+  {
+    sentence:"ブラジル ___ サッカー は ゆうめいです。",
+    correct:"の",
+    translation:"O futebol do Brasil é famoso.",
+    explanation:"の conecta substantivos."
+  },
+
+  // =========================
+  // を
+  // =========================
+
+  {
+    sentence:"コーヒー ___ のみます。",
+    correct:"を",
+    translation:"Bebo café.",
+    explanation:"を marca objeto direto."
+  },
+
+  {
+    sentence:"テレビ ___ みます。",
+    correct:"を",
+    translation:"Assisto televisão.",
+    explanation:"を marca objeto direto."
+  },
+
+  {
+    sentence:"ラーメン ___ たべました。",
+    correct:"を",
+    translation:"Comi lámen.",
+    explanation:"を indica o objeto da ação."
+  },
+
+  {
+    sentence:"ほん ___ よみます。",
+    correct:"を",
+    translation:"Leio um livro.",
+    explanation:"を marca o objeto do verbo."
+  },
+
+  {
+    sentence:"えいが ___ みたいです。",
+    correct:"を",
+    translation:"Quero assistir um filme.",
+    explanation:"を marca objeto direto."
+  },
+
+  {
+    sentence:"にほんご ___ べんきょうします。",
+    correct:"を",
+    translation:"Estudo japonês.",
+    explanation:"を indica o objeto estudado."
+  },
+
+  {
+    sentence:"おんがく ___ ききます。",
+    correct:"を",
+    translation:"Escuto música.",
+    explanation:"を marca objeto direto."
+  },
+
+  {
+    sentence:"ゲーム ___ します。",
+    correct:"を",
+    translation:"Jogo videogame.",
+    explanation:"を marca objeto da ação."
+  },
+
+  {
+    sentence:"てがみ ___ かきます。",
+    correct:"を",
+    translation:"Escrevo uma carta.",
+    explanation:"を marca objeto direto."
+  },
+
+  {
+    sentence:"みず ___ のみたいです。",
+    correct:"を",
+    translation:"Quero beber água.",
+    explanation:"を marca objeto."
+  },
+
+  // =========================
+  // に
+  // =========================
+
+  {
+    sentence:"がっこう ___ いきます。",
+    correct:"に",
+    translation:"Vou para a escola.",
+    explanation:"に indica destino."
+  },
+
+  {
+    sentence:"7じ ___ おきます。",
+    correct:"に",
+    translation:"Acordo às 7 horas.",
+    explanation:"に marca tempo específico."
+  },
+
+  {
+    sentence:"にほん ___ いきたいです。",
+    correct:"に",
+    translation:"Quero ir ao Japão.",
+    explanation:"に marca destino."
+  },
+
+  {
+    sentence:"ともだち ___ あいます。",
+    correct:"に",
+    translation:"Vou encontrar meu amigo.",
+    explanation:"に marca alvo da ação."
+  },
+
+  {
+    sentence:"うち ___ かえります。",
+    correct:"に",
+    translation:"Volto para casa.",
+    explanation:"に indica destino."
+  },
+
+  {
+    sentence:"えき ___ いきます。",
+    correct:"に",
+    translation:"Vou para a estação.",
+    explanation:"に marca destino."
+  },
+
+  {
+    sentence:"にちようび ___ サッカー を します。",
+    correct:"に",
+    translation:"Jogo futebol no domingo.",
+    explanation:"に marca tempo específico."
+  },
+
+  {
+    sentence:"せんせい ___ ききます。",
+    correct:"に",
+    translation:"Pergunto ao professor.",
+    explanation:"に marca alvo da pergunta."
+  },
+
+  {
+    sentence:"ホテル ___ とまります。",
+    correct:"に",
+    translation:"Fico em um hotel.",
+    explanation:"に marca local de permanência."
+  },
+
+  {
+    sentence:"ともだち ___ プレゼント を あげます。",
+    correct:"に",
+    translation:"Dou um presente ao amigo.",
+    explanation:"に indica destinatário."
+  },
+
+  // =========================
+  // で
+  // =========================
+
+  {
+    sentence:"レストラン ___ たべます。",
+    correct:"で",
+    translation:"Comerei no restaurante.",
+    explanation:"で marca local da ação."
+  },
+
+  {
+    sentence:"うち ___ べんきょうします。",
+    correct:"で",
+    translation:"Estudo em casa.",
+    explanation:"で indica onde ocorre a ação."
+  },
+
+  {
+    sentence:"こうえん ___ サッカー を します。",
+    correct:"で",
+    translation:"Jogo futebol no parque.",
+    explanation:"で marca local da ação."
+  },
+
+  {
+    sentence:"バス ___ がっこう へ いきます。",
+    correct:"で",
+    translation:"Vou à escola de ônibus.",
+    explanation:"で indica meio de transporte."
+  },
+
+  {
+    sentence:"カフェ ___ コーヒー を のみます。",
+    correct:"で",
+    translation:"Bebo café na cafeteria.",
+    explanation:"で marca local da ação."
+  },
+
+  {
+    sentence:"ナイフ ___ きります。",
+    correct:"で",
+    translation:"Corto com faca.",
+    explanation:"で indica instrumento."
+  },
+
+  {
+    sentence:"えき ___ しんぶん を かいます。",
+    correct:"で",
+    translation:"Compro jornal na estação.",
+    explanation:"で marca local da ação."
+  },
+
+  {
+    sentence:"オンライン ___ はなします。",
+    correct:"で",
+    translation:"Converso online.",
+    explanation:"で indica meio/local da ação."
+  },
+
+  {
+    sentence:"スーパー ___ かいものします。",
+    correct:"で",
+    translation:"Faço compras no supermercado.",
+    explanation:"で indica local da ação."
+  },
+
+  {
+    sentence:"スマホ ___ しゃしん を とります。",
+    correct:"で",
+    translation:"Tiro foto com smartphone.",
+    explanation:"で indica instrumento."
+  },
+
+  // =========================
+  // と
+  // =========================
+
+  {
+    sentence:"ともだち ___ えいが を みます。",
+    correct:"と",
+    translation:"Assisto filme com meu amigo.",
+    explanation:"と significa 'com'."
+  },
+
+  {
+    sentence:"かぞく ___ りょこうします。",
+    correct:"と",
+    translation:"Viajo com a família.",
+    explanation:"と indica companhia."
+  },
+
+  {
+    sentence:"せんせい ___ はなします。",
+    correct:"と",
+    translation:"Converso com o professor.",
+    explanation:"と significa 'com'."
+  },
+
+  {
+    sentence:"マリアさん ___ ランチ を たべます。",
+    correct:"と",
+    translation:"Almoço com Maria.",
+    explanation:"と indica companhia."
+  },
+
+  {
+    sentence:"コーヒー ___ パン を かいました。",
+    correct:"と",
+    translation:"Comprei café e pão.",
+    explanation:"と conecta substantivos."
+  },
+
+  {
+    sentence:"いぬ ___ さんぽします。",
+    correct:"と",
+    translation:"Passeio com o cachorro.",
+    explanation:"と significa 'com'."
+  },
+
+  {
+    sentence:"ともだち ___ ゲーム を します。",
+    correct:"と",
+    translation:"Jogo videogame com amigos.",
+    explanation:"と marca companhia."
+  },
+
+  {
+    sentence:"にほんじん ___ はなしたいです。",
+    correct:"と",
+    translation:"Quero conversar com japoneses.",
+    explanation:"と indica companhia/interação."
+  },
+
+  {
+    sentence:"サラダ ___ ジュース を たのみました。",
+    correct:"と",
+    translation:"Pedi salada e suco.",
+    explanation:"と liga itens."
+  },
+
+  {
+    sentence:"せんせい ___ がくせい が います。",
+    correct:"と",
+    translation:"Há professores e alunos.",
+    explanation:"と conecta substantivos."
+  },
+
+  // =========================
+  // も
+  // =========================
+
+  {
+    sentence:"わたし ___ にほんご を べんきょうしています。",
+    correct:"も",
+    translation:"Eu também estudo japonês.",
+    explanation:"も significa 'também'."
+  },
+
+  {
+    sentence:"マリアさん ___ がくせいです。",
+    correct:"も",
+    translation:"Maria também é estudante.",
+    explanation:"も adiciona ideia de inclusão."
+  },
+
+  {
+    sentence:"わたし ___ コーヒー が すきです。",
+    correct:"も",
+    translation:"Eu também gosto de café.",
+    explanation:"も significa 'também'."
+  },
+
+  {
+    sentence:"きょう ___ いそがしいです。",
+    correct:"も",
+    translation:"Hoje também estou ocupado.",
+    explanation:"も adiciona repetição/inclusão."
+  },
+
+  {
+    sentence:"ブラジル ___ あついです。",
+    correct:"も",
+    translation:"O Brasil também é quente.",
+    explanation:"も significa 'também'."
+  },
+
+  {
+    sentence:"ともだち ___ きました。",
+    correct:"も",
+    translation:"O amigo também veio.",
+    explanation:"も adiciona inclusão."
+  },
+
+  {
+    sentence:"ラーメン ___ たべたいです。",
+    correct:"も",
+    translation:"Também quero comer lámen.",
+    explanation:"も significa 'também'."
+  },
+
+  {
+    sentence:"にほんご ___ えいご ___ むずかしいです。",
+    correct:"も",
+    translation:"Japonês e inglês também são difíceis.",
+    explanation:"も pode repetir ideia de inclusão."
+  },
+
+  {
+    sentence:"せんせい ___ わかりません。",
+    correct:"も",
+    translation:"Nem o professor entende.",
+    explanation:"も enfatiza inclusão."
+  },
+
+  {
+    sentence:"わたしのかぞく ___ アニメ が すきです。",
+    correct:"も",
+    translation:"Minha família também gosta de anime.",
+    explanation:"も significa 'também'."
+  }
+
+];
+
+let currentQuestion = null;
+
+let answered = false;
+
+let correct = 0;
+
+let wrong = 0;
+
+let questionCount = 1;
+
+const sentenceEl =
+  document.getElementById("sentence");
+
+const translationEl =
+  document.getElementById("translation");
+
+const optionsEl =
+  document.getElementById("options");
+
+const feedbackEl =
+  document.getElementById("feedback");
+
+const nextBtn =
+  document.getElementById("nextBtn");
+
+const correctCountEl =
+  document.getElementById("correctCount");
+
+const wrongCountEl =
+  document.getElementById("wrongCount");
+
+const questionCountEl =
+  document.getElementById("questionCount");
+
+function shuffle(array){
+
+  return [...array]
+    .sort(()=>Math.random()-0.5);
+}
+
+function randomItem(array){
+
+  return array[
+    Math.floor(
+      Math.random()*array.length
+    )
+  ];
+}
+
+function generateQuestion(){
+
+  answered = false;
+
+  feedbackEl.innerHTML = "";
+
+  nextBtn.style.display = "none";
+
+  currentQuestion =
+    randomItem(questions);
+
+  sentenceEl.textContent =
+    currentQuestion.sentence;
+
+  translationEl.innerHTML =
+    `🇧🇷 ${currentQuestion.translation}`;
+
+  optionsEl.innerHTML = "";
+
+  const options =
+    shuffle(particles);
+
+  options.forEach(option=>{
+
+    const btn =
+      document.createElement("button");
+
+    btn.className = "option";
+
+    btn.textContent = option;
+
+    btn.addEventListener("click",()=>{
+
+      checkAnswer(btn,option);
+
+    });
+
+    optionsEl.appendChild(btn);
+
+  });
+
+}
+
+function checkAnswer(button,selected){
+
+  if(answered) return;
+
+  answered = true;
+
+  const buttons =
+    document.querySelectorAll(".option");
+
+  buttons.forEach(btn=>{
+
+    btn.disabled = true;
+
+  });
+
+  if(selected === currentQuestion.correct){
+
+    button.classList.add("correct");
+
+    feedbackEl.innerHTML =
+
+      `
+      <div style="color:#4ade80;font-weight:700;">
+        ✅ Correto!
+      </div>
+
+      <div style="margin-top:10px;">
+        ${currentQuestion.explanation}
+      </div>
+      `;
+
+    correct++;
+
+    correctCountEl.textContent =
+      correct;
+
+  } else {
+
+    button.classList.add("wrong");
+
+    buttons.forEach(btn=>{
+
+      if(
+        btn.textContent ===
+        currentQuestion.correct
+      ){
+
+        btn.classList.add("correct");
+      }
+
+    });
+
+    feedbackEl.innerHTML =
+
+      `
+      <div style="color:#f87171;font-weight:700;">
+        ❌ Errado!
+      </div>
+
+      <div style="margin-top:10px;">
+        A resposta correta é:
+        <strong>${currentQuestion.correct}</strong>
+      </div>
+
+      <div style="margin-top:10px;">
+        ${currentQuestion.explanation}
+      </div>
+      `;
+
+    wrong++;
+
+    wrongCountEl.textContent =
+      wrong;
+  }
+
+  nextBtn.style.display = "block";
+}
+
+nextBtn.addEventListener("click",()=>{
+
+  questionCount++;
+
+  questionCountEl.textContent =
+    questionCount;
+
+  generateQuestion();
+
+});
+
+generateQuestion();
+
+</script>
+
+</body>
+</html>

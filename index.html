@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estudos de Japonês</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    body{
+
+      min-height:100vh;
+
+      display:flex;
+      justify-content:center;
+      align-items:center;
+
+      padding:20px;
+
+      font-family:"Segoe UI",sans-serif;
+
+      background:
+        linear-gradient(135deg,#0f172a,#1e293b);
+
+      color:white;
+    }
+
+    .container{
+
+      width:100%;
+      max-width:1000px;
+    }
+
+    .header{
+
+      text-align:center;
+
+      margin-bottom:40px;
+    }
+
+    .title{
+
+      font-size:3rem;
+
+      font-weight:800;
+
+      margin-bottom:14px;
+    }
+
+    .subtitle{
+
+      color:#cbd5e1;
+
+      font-size:1.1rem;
+
+      line-height:1.7;
+    }
+
+    .cards{
+
+      display:grid;
+
+      grid-template-columns:
+        repeat(auto-fit,minmax(280px,1fr));
+
+      gap:24px;
+    }
+
+    .card{
+
+      background:
+        rgba(255,255,255,0.06);
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius:28px;
+
+      padding:28px;
+
+      backdrop-filter:blur(12px);
+
+      transition:0.25s;
+
+      text-decoration:none;
+
+      color:white;
+
+      position:relative;
+
+      overflow:hidden;
+    }
+
+    .card:hover{
+
+      transform:
+        translateY(-6px);
+
+      border-color:#60a5fa;
+
+      box-shadow:
+        0 20px 40px rgba(0,0,0,0.35);
+    }
+
+    .emoji{
+
+      font-size:3rem;
+
+      margin-bottom:18px;
+    }
+
+    .card-title{
+
+      font-size:1.6rem;
+
+      font-weight:700;
+
+      margin-bottom:14px;
+    }
+
+    .card-text{
+
+      color:#cbd5e1;
+
+      line-height:1.7;
+
+      margin-bottom:22px;
+    }
+
+    .button{
+
+      display:inline-block;
+
+      background:
+        linear-gradient(135deg,#3b82f6,#2563eb);
+
+      padding:12px 18px;
+
+      border-radius:14px;
+
+      font-weight:700;
+
+      font-size:0.95rem;
+
+      transition:0.2s;
+    }
+
+    .card:hover .button{
+
+      transform:
+        translateY(-2px);
+    }
+
+    .footer{
+
+      text-align:center;
+
+      margin-top:40px;
+
+      color:#94a3b8;
+
+      font-size:0.95rem;
+    }
+
+    @media(max-width:700px){
+
+      .title{
+        font-size:2.2rem;
+      }
+
+      .subtitle{
+        font-size:1rem;
+      }
+
+      .card{
+        padding:22px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <div class="title">
+      日本語トレーニング
+    </div>
+
+    <div class="subtitle">
+      Escolha o tipo de treino que deseja praticar.
+      <br>
+      Estude Katakana, palavras em Katakana e partículas japonesas.
+    </div>
+
+  </div>
+
+  <div class="cards">
+
+    <!-- ===================== -->
+    <!-- KATAKANA -->
+    <!-- ===================== -->
+
+    <a
+      href="katakana.html"
+      class="card">
+
+      <div class="emoji">
+        ア
+      </div>
+
+      <div class="card-title">
+        Treino de Katakana
+      </div>
+
+      <div class="card-text">
+
+        Pratique os caracteres básicos
+        do Katakana identificando
+        leituras e símbolos.
+
+      </div>
+
+      <div class="button">
+        Estudar →
+      </div>
+
+    </a>
+
+    <!-- ===================== -->
+    <!-- PALAVRAS -->
+    <!-- ===================== -->
+
+    <a
+      href="palavras.html"
+      class="card">
+
+      <div class="emoji">
+        コンピューター
+      </div>
+
+      <div class="card-title">
+        Palavras em Katakana
+      </div>
+
+      <div class="card-text">
+
+        Estude palavras estrangeiras,
+        nomes, países, comidas,
+        cidades e muito mais.
+
+      </div>
+
+      <div class="button">
+        Estudar →
+      </div>
+
+    </a>
+
+    <!-- ===================== -->
+    <!-- PARTÍCULAS -->
+    <!-- ===================== -->
+
+    <a
+      href="particulas.html"
+      class="card">
+
+      <div class="emoji">
+        は ・ が ・ を
+      </div>
+
+      <div class="card-title">
+        Partículas Japonesas
+      </div>
+
+      <div class="card-text">
+
+        Treine o uso das partículas
+        japonesas com explicações
+        detalhadas e frases úteis.
+
+      </div>
+
+      <div class="button">
+        Estudar →
+      </div>
+
+    </a>
+
+  </div>
+
+  <div class="footer">
+
+    Boa prática! がんばって！
+
+  </div>
+
+</div>
+
+</body>
+</html>
